@@ -1,0 +1,73 @@
+/* 全局样式 */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #eaf2f1; /* 深色背景 */
+    color: #b81313; /* 文字颜色改成白色 */
+}
+
+/* 容器样式 */
+.container {
+    max-width: 1000px; /* 增大容器宽度 */
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+/* 表格样式 */
+table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+/* 表头样式 */
+th {
+    background-color: #4e6c40; /* 深绿色 */
+    color: hsl(0, 16%, 96%);
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+/* 表格单元格样式 */
+td {
+    background-color: #5c8d45; /* 浅绿色 */
+    color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+/* 按钮样式 */
+button {
+    padding: 8px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: #ff9800; /* 亮橙色 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #e68900; /* 悬停时变深 */
+}
+
+/* 输入框样式 */
+input[type="text"] {
+    padding: 8px;
+    width: 180px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #2d4a1e; /* 深绿色 */
+    color: white;
+}
+
+/* 输入框获得焦点时 */
+input[type="text"]:focus {
+    border-color: #ff9800; /* 聚焦时边框变亮 */
+    outline: none;
+}

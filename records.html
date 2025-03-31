@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字记录历史</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+            font-size: 14px;
+        }
+        .hidden { display: none; }
+        #lotteryResult {
+            font-size: 24px;
+            font-weight: bold;
+            color: green;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="lotteryResultTitle">开奖号码</div>
+    <div id="lotteryResult">等待开奖...</div>
+
+    <h2>数字记录历史</h2>
+    <table id="recordTable">
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>记录号码</th>
+                <th id="actionHeader" class="hidden">操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="loginBox">
+        <h3>请输入密码以修改数据</h3>
+        <input type="password" id="loginPassword" placeholder="输入密码">
+        <button onclick="checkLogin()">登录</button>
+    </div>
+
+    <div id="recordBox" class="hidden">
+        <h3>添加新记录</h3>
+        <input type="date" id="recordDate">
+        <input type="text" id="recordNumber" placeholder="输入号码">
+        <button onclick="addRecord()">添加</button>
+        <button onclick="logout()">退出</button>
+    </div>
+
+    <div id="lotteryBox" class="hidden">
+        <h3>开奖功能</h3>
+        <button onclick="startLottery()">开始滚动</button>
+        <button onclick="stopLottery()">停止滚动</button>
+        <input type="text" id="fixedNumber" placeholder="设置固定号码">
+        <button onclick="setFixedNumber()">设置固定号码</button>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = "ty112113";
+        const MAX_RECORDS = 50;
+        let fixedNumber = null;
+        let rollInterval;
+
+        function loadRecords() {
+            let records = JSON.parse(localStorage.getItem("records")) || [];
+            let tbody = document.querySelector("#recordTable tbody");
+            tbody.innerHTML = "";
+
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let isLoggedIn = localStorage.getItem("loggedIn") === "true";
+
+            records.forEach((record, index) => {
+                let row = `<tr>
+                    <td>${record.date}</td>
+                    <td>${record.number}</td>
+                    ${isLoggedIn ? `<td><button onclick="deleteRecord(${index})">删除</button></td>` : ""}
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function checkLogin() {
+            let inputPassword = document.getElementById("loginPassword").value;
+            if (inputPassword === CORRECT_PASSWORD) {
+                localStorage.setItem("loggedIn", "true");
+                document.getElementById("loginBox").classList.add("hidden");
+                document.getElementById("recordBox").classList.remove("hidden");
+                document.getElementById("lotteryBox").classList.remove("hidden");
+                loadRecords();
+            } else {
+                alert("密码错误！");
+            }
+        }
+
+        function addRecord() {
+            let date = document.getElementById("recordDate").value;
+            let number = document.getElementById("recordNumber").value;
+            if (!date || !number) {
+                alert("请填写完整信息！");
+                return;
+            }
+            let records = JSON.parse(localStorage.getItem("records")) || [];
+            records.push({ date, number });
+            while (records.length > MAX_RECORDS) records.shift();
+            localStorage.setItem("records", JSON.stringify(records));
+            loadRecords();
+        }
+
+        function deleteRecord(index) {
+            let records = JSON.parse(localStorage.getItem("records")) || [];
+            records.splice(index, 1);
+            localStorage.setItem("records", JSON.stringify(records));
+            loadRecords();
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            document.getElementById("loginBox").classList.remove("hidden");
+            document.getElementById("recordBox").classList.add("hidden");
+            document.getElementById("lotteryBox").classList.add("hidden");
+        }
+
+        function startLottery() {
+            if (rollInterval) return;
+            let lotteryResultElement = document.getElementById("lotteryResult");
+            rollInterval = setInterval(() => {
+                lotteryResultElement.textContent = fixedNumber || String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+            }, 100);
+        }
+
+        function stopLottery() {
+            clearInterval(rollInterval);
+            rollInterval = null;
+        }
+
+        function setFixedNumber() {
+            fixedNumber = document.getElementById("fixedNumber").value;
+            if (fixedNumber) {
+                document.getElementById("lotteryResult").textContent = fixedNumber;
+                stopLottery();
+            }
+        }
+
+        window.onload = function() {
+            loadRecords();
+            if (localStorage.getItem("loggedIn") === "true") {
+                document.getElementById("loginBox").classList.add("hidden");
+                document.getElementById("recordBox").classList.remove("hidden");
+                document.getElementById("lotteryBox").classList.remove("hidden");
+            }
+        };
+    </script>
+</body>
+</html>
